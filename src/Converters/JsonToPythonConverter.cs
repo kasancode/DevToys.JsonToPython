@@ -138,7 +138,7 @@ public class JsonToPythonConverter(string json, PythonDataType outputType = Pyth
         var baseHash = 0;
         foreach (var hash in hashes)
         {
-            baseHash = unchecked(baseHash + hash);
+            baseHash = unchecked(baseHash ^ hash);
         }
 
         return baseHash;
