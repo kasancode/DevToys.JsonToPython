@@ -7,6 +7,12 @@
 		<RepositoryUrl>https://github.com/kasancode/DevToys.JsonToPython</RepositoryUrl>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 	</PropertyGroup>
+	<ItemGroup>
+	  <None Include="..\README.md">
+	    <Pack>True</Pack>
+	    <PackagePath>\</PackagePath>
+	  </None>
+	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="CaseConverter" Version="2.0.1" />
