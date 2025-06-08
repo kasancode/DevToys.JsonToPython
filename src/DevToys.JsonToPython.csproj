@@ -6,6 +6,7 @@
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<RepositoryUrl>https://github.com/kasancode/DevToys.JsonToPython</RepositoryUrl>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<Title>DevToys.JsonToPython</Title>
 	</PropertyGroup>
 	<ItemGroup>
 	  <None Include="..\README.md">
