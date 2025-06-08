@@ -1,5 +1,4 @@
-﻿using CaseConverter;
-using DevToys.Api;
+﻿using DevToys.Api;
 using System.Text;
 using System.Text.Json;
 
@@ -39,72 +38,78 @@ public class JsonToPythonConverter(string json, PythonDataType outputType = Pyth
 
     public string Convert()
     {
-        this.InitFlag();
-
-        using var document = JsonDocument.Parse(this._json, new JsonDocumentOptions
+        try
         {
-            AllowTrailingCommas = true,
-            CommentHandling = JsonCommentHandling.Skip
-        });
+            this.InitFlag();
 
-        var classCodes = new List<(string ClassName, string Code, int Hash)>();
+            using var document = JsonDocument.Parse(this._json, new JsonDocumentOptions
+            {
+                AllowTrailingCommas = true,
+                CommentHandling = JsonCommentHandling.Skip
+            });
 
-        // check root class name
-        var rootName = this._rootNameBase;
+            var classCodes = new List<(string ClassName, string Code, int Hash)>();
 
-        var index = 1;
-        while (this._json.Contains(rootName))
+            // check root class name
+            var rootName = this._rootNameBase;
+
+            var index = 1;
+            while (this._json.Contains(rootName))
+            {
+                index++;
+                rootName = $"{this._rootNameBase}{index}";
+            }
+
+            // convert json to python
+            this.CreateClassDefinition(document.RootElement, rootName, classCodes);
+
+            // check importing packages
+            var importBuilder = new StringBuilder();
+
+            var typingClasses = new List<string>();
+            var importLines = new List<string>();
+
+            if (this._useAny)
+            {
+                typingClasses.Add("Any");
+            }
+
+            switch (this._outputType)
+            {
+                case PythonDataType.TypedDict:
+                    typingClasses.Add("TypedDict");
+                    break;
+                case PythonDataType.DataClass:
+                    importLines.Add("from dataclasses import dataclass");
+                    break;
+                case PythonDataType.Pydantic:
+                    importLines.Add("from pydantic import BaseModel");
+                    break;
+            }
+
+            if (typingClasses.Count > 0)
+            {
+                importLines.Add($"from typing import {string.Join(", ", typingClasses)}");
+            }
+
+            if (importLines.Count > 0)
+            {
+                // for 2 empty line
+                importLines.AddRange(["", ""]);
+            }
+
+            if (this._defineNumber)
+            {
+                importLines.AddRange(["type Number = int | float", ""]);
+            }
+
+            importLines.AddRange(classCodes.Select(item => item.Code));
+
+            return string.Join(Environment.NewLine, importLines);
+        }catch(Exception ex)
         {
-            index++;
-            rootName = $"{this._rootNameBase}{index}";
+            return ex.Message;
         }
-
-        // convert json to python
-        this.CreateClassDefinition(document.RootElement, rootName, classCodes);
-
-        // check importing packages
-        var importBuilder = new StringBuilder();
-
-        var typingClasses = new List<string>();
-        var importLines = new List<string>();
-
-        if (this._useAny)
-        {
-            typingClasses.Add("Any");
-        }
-
-        switch (this._outputType)
-        {
-            case PythonDataType.TypedDict:
-                typingClasses.Add("TypedDict");
-                break;
-            case PythonDataType.DataClass:
-                importLines.Add("from dataclasses import dataclass");
-                break;
-            case PythonDataType.Pydantic:
-                importLines.Add("from pydantic import BaseModel");
-                break;
-        }
-
-        if (typingClasses.Count > 0)
-        {
-            importLines.Add($"from typing import {string.Join(", ", typingClasses)}");
-        }
-
-        if (importLines.Count > 0)
-        {
-            // for 2 empty line
-            importLines.AddRange(["", ""]);
-        }
-
-        if (this._defineNumber)
-        {
-            importLines.AddRange(["type Number = int | float", ""]);
-        }
-
-        importLines.AddRange(classCodes.Select(item => item.Code));
-
-        return string.Join(Environment.NewLine, importLines);
     }
 
     internal string ToPythonType(JsonValueKind kind)
