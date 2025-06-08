@@ -1,29 +1,29 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<RepositoryUrl>https://github.com/kasancode/DevToys.JsonToPython</RepositoryUrl>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+	</PropertyGroup>
 
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="CaseConverter" Version="2.0.1" />
+		<PackageReference Include="DevToys.Api" Version="2.0.8-preview" />
+	</ItemGroup>
+	<ItemGroup>
+		<Compile Update="JsonToPythonExtension.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>JsonToPythonExtension.resx</DependentUpon>
+		</Compile>
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="CaseConverter" Version="2.0.1" />
-    <PackageReference Include="DevToys.Api" Version="2.0.8-preview" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Update="JsonToPythonExtension.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>JsonToPythonExtension.resx</DependentUpon>
-    </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Update="JsonToPythonExtension.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>JsonToPythonExtension.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-  </ItemGroup>
-
+	<ItemGroup>
+		<EmbeddedResource Update="JsonToPythonExtension.resx">
+			<Generator>ResXFileCodeGenerator</Generator>
+			<LastGenOutput>JsonToPythonExtension.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+	</ItemGroup>
 </Project>
