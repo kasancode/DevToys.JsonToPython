@@ -1,6 +1,7 @@
 ﻿using DevToys.Api;
 using DevToys.JsonToPython.Converters;
 using System.ComponentModel.Composition;
+using System.Diagnostics;
 using static DevToys.Api.GUI;
 
 namespace DevToys.JsonToPython;
@@ -24,10 +25,6 @@ internal sealed class JsonToPythonGui : IGuiTool
     private readonly IUIMultiLineTextInput _outputTextArea = MultiLineTextInput("json-to-python-output-text-area");
     private static readonly SettingDefinition<PythonDataType> _pythonDataTypeDefinition = new(name: "Output type", defaultValue: PythonDataType.TypedDict);
     private static readonly SettingDefinition<NumberType> _numberTypeDefinition = new(name: "Number type", defaultValue: NumberType.Union);
-
-    private PythonDataType _pythonDataType = PythonDataType.TypedDict;
-    private NumberType _numberType = NumberType.Union;
-    private string _json = "";
 
     [ImportingConstructor]
     public JsonToPythonGui(ISettingsProvider settingsProvider)
@@ -121,25 +118,26 @@ internal sealed class JsonToPythonGui : IGuiTool
 
     private void OnPythonDataTypeChanged(PythonDataType dataType)
     {
-        this._pythonDataType = dataType;
         this.Convert();
     }
 
     private void OnNumberTypeChanged(NumberType numberType)
     {
-        this._numberType = numberType;
         this.Convert();
     }
 
     private void OnInputTextChanged(string text)
     {
-        this._json = text;
         this.Convert();
     }
 
     private void Convert()
     {
-        if (string.IsNullOrEmpty(this._json))
+        var json = this._inputTextArea.Text;
+        var outputType = _settingsProvider.GetSetting(_pythonDataTypeDefinition);
+        var numberType = _settingsProvider.GetSetting(_numberTypeDefinition);
+
+        if (string.IsNullOrEmpty(json))
         {
             this._outputTextArea.Text(string.Empty);
             return;
@@ -147,7 +145,7 @@ internal sealed class JsonToPythonGui : IGuiTool
 
         try
         {
-            var converter = new JsonToPythonConverter(this._json, this._pythonDataType, this._numberType);
+            var converter = new JsonToPythonConverter(json, outputType, numberType);
             this._outputTextArea.Text(converter.Convert());
         }
         catch
