@@ -87,6 +87,49 @@ namespace DevToys.JsonToPythonTests.Converters
             """);
 
         [TestMethod()]
+        public void ConvertDictFuncUnionTest() => this.ConvertTestCore(PythonDataType.TypedDictFunction, NumberType.Union, """
+            from typing import TypedDict
+
+
+            Address = TypedDict('Address', {
+                'street': str,
+                'zipcode': str
+                })
+
+            Start = TypedDict('Start', {
+                'y': int | float,
+                'm': int | float,
+                'd': int | float
+                })
+
+            Span = TypedDict('Span', {
+                'start': Start,
+                'end': Start
+                })
+
+            Span2 = TypedDict('Span2', {
+                'offset': int | float,
+                'count': int | float
+                })
+
+            Metadata = TypedDict('Metadata', {
+                'span': Span2
+                })
+
+            JsonRootElement = TypedDict('JsonRootElement', {
+                'name': str,
+                'age': int | float,
+                'city': str,
+                'address': Address,
+                'hobbies': list[str],
+                'span': Span,
+                'customers': list[Address],
+                'metadata': Metadata
+                })
+
+            """);
+
+        [TestMethod()]
         public void ConvertDataClassUnionTest() => this.ConvertTestCore(PythonDataType.DataClass, NumberType.Union, """
             from dataclasses import dataclass
 

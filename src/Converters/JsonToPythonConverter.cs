@@ -8,6 +8,7 @@ public enum PythonDataType
 {
     DataClass,
     TypedDict,
+    TypedDictFunction,
     Pydantic
 }
 
@@ -75,6 +76,7 @@ public class JsonToPythonConverter(string json, PythonDataType outputType = Pyth
         switch (this._outputType)
         {
             case PythonDataType.TypedDict:
+            case PythonDataType.TypedDictFunction:
                 typingClasses.Add("TypedDict");
                 break;
             case PythonDataType.DataClass:
@@ -151,7 +153,7 @@ public class JsonToPythonConverter(string json, PythonDataType outputType = Pyth
         }
 
         var headerBuilder = new StringBuilder();
-        var memberBuilder = new StringBuilder();
+        var bodyBuilder = new StringBuilder();
 
         // for check already defined
         var hash = 0;
@@ -203,8 +205,18 @@ public class JsonToPythonConverter(string json, PythonDataType outputType = Pyth
             }
 
             hash = this.SimpleConbineHash(hash, HashCode.Combine(property.Name, propertyTypeHash));
-            memberBuilder.AppendLine($"{this._indent}{property.Name}: {propertyTypeName}");
-
+            if (this._outputType == PythonDataType.TypedDictFunction)
+            {
+                if (bodyBuilder.Length > 0)
+                {
+                    bodyBuilder.AppendLine(",");
+                }
+                bodyBuilder.Append($"{this._indent}'{property.Name}': {propertyTypeName}");
+            }
+            else
+            {
+                bodyBuilder.AppendLine($"{this._indent}{property.Name}: {propertyTypeName}");
+            }
         }
 
         // search same definition
@@ -229,6 +241,11 @@ public class JsonToPythonConverter(string json, PythonDataType outputType = Pyth
                 case PythonDataType.TypedDict:
                     headerBuilder.AppendLine($"class {className}(TypedDict):");
                     break;
+                case PythonDataType.TypedDictFunction:
+                    headerBuilder.AppendLine($"{className} = TypedDict('{className}', {{");
+                    bodyBuilder.AppendLine();
+                    bodyBuilder.AppendLine($"{this._indent}}})");
+                    break;
                 case PythonDataType.DataClass:
                     headerBuilder.AppendLine("@dataclass");
                     headerBuilder.AppendLine($"class {className}:");
@@ -238,7 +255,7 @@ public class JsonToPythonConverter(string json, PythonDataType outputType = Pyth
                     break;
             }
 
-            headerBuilder.Append(memberBuilder);
+            headerBuilder.Append(bodyBuilder);
 
             outputList.Add((className, headerBuilder.ToString(), hash));
 

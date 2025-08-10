@@ -74,7 +74,8 @@ internal sealed class JsonToPythonGui : IGuiTool
                                     this._settingsProvider,
                                     _pythonDataTypeDefinition,
                                     this.OnPythonDataTypeChanged,
-                                    Item("TypedDict", PythonDataType.TypedDict),
+                                    Item("TypedDict (class)", PythonDataType.TypedDict),
+                                    Item("TypedDict (function)", PythonDataType.TypedDictFunction),
                                     Item("dataclass", PythonDataType.DataClass),
                                     Item("pydantic", PythonDataType.Pydantic)
                                 ),
